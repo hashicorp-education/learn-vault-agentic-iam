@@ -1,0 +1,10 @@
+# Generated TLS material (mkcert CA + server cert/key)
+tls/
+# Vault unseal key + root token
+vault/init/vault-init.json
+# Raft storage data
+vault/data/
+# Audit + server logs
+logs/
+# Local env overrides
+.env

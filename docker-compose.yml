@@ -1,0 +1,53 @@
+name: learn-vault-agent-iam
+
+services:
+  # 1. Generate TLS material with mkcert and capture the CA certificate.
+  tls-init:
+    build:
+      context: ./scripts
+      dockerfile: Dockerfile.mkcert
+    image: learn-vault-agent-iam/mkcert:latest
+    volumes:
+      - ./tls:/tls
+
+  # 2. Vault Enterprise server (single node, raft storage, TLS).
+  vault:
+    image: hashicorp/vault-enterprise:2.0.2-ent
+    hostname: vault
+    depends_on:
+      tls-init:
+        condition: service_completed_successfully
+    ports:
+      - "8200:8200"
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: "https://127.0.0.1:8200"
+      VAULT_CACERT: "/vault/tls/vault-ca.pem"
+      VAULT_LICENSE: "${VAULT_LICENSE:?Set VAULT_LICENSE in your host environment to a valid Vault Enterprise license string}"
+    volumes:
+      - ./vault/config:/vault/config:ro
+      - ./tls:/vault/tls:ro
+      - ./logs:/vault/logs
+      - ./vault/data:/vault/data
+    command: server
+    restart: unless-stopped
+
+  # 3. One-shot: init, unseal, and preconfigure the lab.
+  vault-init:
+    image: hashicorp/vault-enterprise:2.0.2-ent
+    depends_on:
+      vault:
+        condition: service_started
+    environment:
+      VAULT_ADDR: "https://vault:8200"
+      VAULT_CACERT: "/vault/tls/vault-ca.pem"
+      OLIVER_PASSWORD: "${OLIVER_PASSWORD:-oliver-example-YgGk0ycnbrUOOEux}"
+      DANIELLE_PASSWORD: "${DANIELLE_PASSWORD:-danielle-example-8HMurmZddhPBM5KR}"
+      ACTIVATE_OAUTH_RS: "${ACTIVATE_OAUTH_RS:-true}"
+    volumes:
+      - ./scripts:/scripts:ro
+      - ./tls:/vault/tls:ro
+      - ./vault/init:/vault/init
+    entrypoint: ["/bin/sh", "/scripts/bootstrap.sh"]
+    restart: "no"
