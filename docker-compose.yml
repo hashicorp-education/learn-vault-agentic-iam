@@ -12,7 +12,7 @@ services:
 
   # 2. Vault Enterprise server (single node, raft storage, TLS).
   vault:
-    image: hashicorp/vault-enterprise:2.0.2-ent
+    image: hashicorp/vault-enterprise:2.0.3-ent
     hostname: vault
     depends_on:
       tls-init:
