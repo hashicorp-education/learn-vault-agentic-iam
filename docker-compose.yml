@@ -35,7 +35,7 @@ services:
 
   # 3. One-shot: init, unseal, and preconfigure the lab.
   vault-init:
-    image: hashicorp/vault-enterprise:2.0.2-ent
+    image: hashicorp/vault-enterprise:2.0.3-ent
     depends_on:
       vault:
         condition: service_started
