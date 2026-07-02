@@ -1,9 +1,9 @@
 #!/bin/sh
-# bootstrap.sh - Initialize, unseal, and preconfigure the Vault Enterprise lab.
+# bootstrap.sh: Initialize, unseal, and preconfigure the Vault Enterprise lab.
 #
-# Runs once in the vault-init container after the Vault server is listening.
-# It automates EVERYTHING the operator (Oliver) and developer (Danielle) need
-# *up to* the point where the tutorial begins:
+# Runs once in the vault-init container after confirming Vault server status.
+# This automates all preconfiguration steps the operator (Oliver) and developer
+# (Danielle) need *up to the point* where the tutorial begins:
 #
 #   * operator init + unseal (1 share / 1 threshold for a single-node lab)
 #   * file audit device
@@ -18,11 +18,13 @@
 #   * activates the OAuth resource server feature flag so the operator can
 #     create the resource server profile during the tutorial
 #
-# It DOES NOT create the OAuth resource server profile, the identity entities
+# It does not create the OAuth resource server profile, the identity entities
 # and aliases, or the Agent Registry record. Those are demonstrated by the
-# tutorial itself (Oliver) and then exercised by Danielle.
+# tutorial with the operator persona and then exercised by the
+# developer persona.
 #
 # The script is idempotent; re-running it is safe.
+
 set -eu
 
 INIT_FILE="/vault/init/vault-init.json"

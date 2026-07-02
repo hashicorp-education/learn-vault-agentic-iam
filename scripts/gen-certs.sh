@@ -1,14 +1,15 @@
 #!/bin/sh
-# gen-certs.sh - Generate TLS material for the Vault server with mkcert.
+# gen-certs.sh: Generate TLS material for the Vault server with mkcert.
 #
-# Runs inside the tls-init container. It:
-#   1. Creates a local mkcert CA (stored under /tls/ca so it persists on the host).
-#   2. Issues a server certificate valid for the names the lab uses
+# The script runs inside the **tls-init** container, and does the following:
+#   1. Create local mkcert CA (stored under /tls/ca so it persists on the host).
+#   2. Issue a server certificate valid for the names the lab uses
 #      (localhost, the "vault" compose hostname, and 127.0.0.1 / ::1).
-#   3. Captures the mkcert CA certificate to /tls/vault-ca.pem so it can be
+#   3. Capture the mkcert CA certificate to /tls/vault-ca.pem so it can be
 #      referenced through the VAULT_CACERT environment variable.
 #
-# The script is idempotent: existing material is reused on subsequent runs.
+# NB: The script is idempotent: existing material is reused on subsequent runs.
+
 set -eu
 
 TLS_DIR=/tls
@@ -21,11 +22,11 @@ export CAROOT="${CA_DIR}"
 
 mkdir -p "${SERVER_DIR}" "${CA_DIR}"
 
-if [ -f "${SERVER_DIR}/server.pem" ] && \
-   [ -f "${SERVER_DIR}/server-key.pem" ] && \
-   [ -f "${CA_OUT}" ]; then
-  echo "[tls-init] Existing TLS material found in ${TLS_DIR}; reusing it."
-  exit 0
+if [ -f "${SERVER_DIR}/server.pem" ] &&
+    [ -f "${SERVER_DIR}/server-key.pem" ] &&
+    [ -f "${CA_OUT}" ]; then
+    echo "[tls-init] Existing TLS material found in ${TLS_DIR}; reusing it."
+    exit 0
 fi
 
 echo "[tls-init] Creating mkcert CA in ${CAROOT} ..."
@@ -34,15 +35,15 @@ echo "[tls-init] Creating mkcert CA in ${CAROOT} ..."
 mkcert -CAROOT >/dev/null
 # Force CA creation by issuing a throwaway cert if the root does not yet exist.
 if [ ! -f "${CAROOT}/rootCA.pem" ]; then
-  mkcert -cert-file /tmp/_seed.pem -key-file /tmp/_seed-key.pem localhost >/dev/null 2>&1 || true
-  rm -f /tmp/_seed.pem /tmp/_seed-key.pem
+    mkcert -cert-file /tmp/_seed.pem -key-file /tmp/_seed-key.pem localhost >/dev/null 2>&1 || true
+    rm -f /tmp/_seed.pem /tmp/_seed-key.pem
 fi
 
 echo "[tls-init] Issuing Vault server certificate ..."
 mkcert \
-  -cert-file "${SERVER_DIR}/server.pem" \
-  -key-file  "${SERVER_DIR}/server-key.pem" \
-  localhost vault 127.0.0.1 ::1
+    -cert-file "${SERVER_DIR}/server.pem" \
+    -key-file "${SERVER_DIR}/server-key.pem" \
+    localhost vault 127.0.0.1 ::1
 
 echo "[tls-init] Capturing mkcert CA certificate to ${CA_OUT} ..."
 cp "$(mkcert -CAROOT)/rootCA.pem" "${CA_OUT}"
