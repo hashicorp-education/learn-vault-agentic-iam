@@ -1,4 +1,6 @@
-# Tiny helper image that runs mkcert to produce the Vault TLS material.
+# Helper image that runs mkcert to produce the Vault TLS material.
+# The container for this image exits after completion by design.
+
 FROM alpine:3.20
 
 ARG MKCERT_VERSION=v1.4.4
