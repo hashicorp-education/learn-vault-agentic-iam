@@ -1,0 +1,7 @@
+# Ignore list of words for CodeBook spell checker
+words = [
+    "hashicups",
+    "mkcert",
+    "TLS",
+    "userpass"
+]

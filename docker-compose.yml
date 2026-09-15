@@ -10,9 +10,9 @@ services:
     volumes:
       - ./tls:/tls
 
-  # 2. Vault Enterprise server (single node, raft storage, TLS).
+  # 2. Vault Enterprise server (latest version, single node, raft storage, TLS).
   vault:
-    image: hashicorp/vault-enterprise:2.0.3-ent
+    image: hashicorp/vault-enterprise:latest
     hostname: vault
     depends_on:
       tls-init:

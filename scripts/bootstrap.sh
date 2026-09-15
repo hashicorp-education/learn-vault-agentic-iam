@@ -15,8 +15,6 @@
 #   * userpass auth method with users:
 #       - oliver   / oliver-example-YgGk0ycnbrUOOEux  -> oliver-sudo
 #       - danielle / danielle-password  -> danielle-developer
-#   * activates the OAuth resource server feature flag so the operator can
-#     create the resource server profile during the tutorial
 #
 # It does not create the OAuth resource server profile, the identity entities
 # and aliases, or the Agent Registry record. Those are demonstrated by the
@@ -166,15 +164,9 @@ vault write auth/userpass/users/danielle \
     token_policies="danielle-developer" >/dev/null
 
 ###############################################################################
-# 7. Activate the OAuth resource server feature flag (operator prerequisite).
-#    The profile itself is created by Oliver during the tutorial.
+# 7. # (No longer necessary outside of beta with GA
 ###############################################################################
-if [ "$ACTIVATE_OAUTH_RS" = "true" ]; then
-    log "Activating the OAuth resource server feature flag ..."
-    vault write -force sys/activation-flags/oauth-resource-server/activate >/dev/null 2>&1 &&
-        log "OAuth resource server feature activated." ||
-        log "Note: could not activate oauth-resource-server flag (may already be active or unsupported)."
-fi
+)
 
 ###############################################################################
 # Done.
