@@ -15,8 +15,6 @@
 #   * userpass auth method with users:
 #       - oliver   / oliver-example-YgGk0ycnbrUOOEux  -> oliver-sudo
 #       - danielle / danielle-password  -> danielle-developer
-#   * activates the OAuth resource server feature flag so the operator can
-#     create the resource server profile during the tutorial
 #
 # It does not create the OAuth resource server profile, the identity entities
 # and aliases, or the Agent Registry record. Those are demonstrated by the
@@ -146,35 +144,8 @@ path "*" {
 EOF
 
 ###############################################################################
-# 6. Username & password auth with users oliver and danielle.
+# 7. # (No longer necessary outside of beta with GA
 ###############################################################################
-if vault auth list 2>/dev/null | grep -q '^userpass/'; then
-    log "Auth method 'userpass/' already enabled."
-else
-    log "Enabling userpass auth method ..."
-    vault auth enable userpass >/dev/null
-fi
-
-log "Creating user 'oliver' (oliver-sudo) ..."
-vault write auth/userpass/users/oliver \
-    password="${OLIVER_PASSWORD}" \
-    token_policies="oliver-sudo" >/dev/null
-
-log "Creating user 'danielle' (danielle-developer) ..."
-vault write auth/userpass/users/danielle \
-    password="${DANIELLE_PASSWORD}" \
-    token_policies="danielle-developer" >/dev/null
-
-###############################################################################
-# 7. Activate the OAuth resource server feature flag (operator prerequisite).
-#    The profile itself is created by Oliver during the tutorial.
-###############################################################################
-if [ "$ACTIVATE_OAUTH_RS" = "true" ]; then
-    log "Activating the OAuth resource server feature flag ..."
-    vault write -force sys/activation-flags/oauth-resource-server/activate >/dev/null 2>&1 &&
-        log "OAuth resource server feature activated." ||
-        log "Note: could not activate oauth-resource-server flag (may already be active or unsupported)."
-fi
 
 ###############################################################################
 # Done.
